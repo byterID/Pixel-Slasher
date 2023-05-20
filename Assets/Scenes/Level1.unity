@@ -990,12 +990,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e119e93fc1f0d354298a1f38ed2ae475, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  jumpHeight: 5
+  jumpHeight: 4
   groundCheck: {fileID: 761225688}
   isGrounded: 0
   isClimbing: 0
   isRight: 0
   isMove: 0
+  isSlide: 0
 --- !u!70 &498225673
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -1249,7 +1250,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   FollowSpeed: 5
-  yOffset: 1
+  yOffset: 0.5
   target: {fileID: 498225670}
 --- !u!1 &619394800
 GameObject:

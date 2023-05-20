@@ -17,6 +17,11 @@ public class Warrior : MonoBehaviour
     Rigidbody2D rb;
     private float _walkSpeed = 3;
 
+    public bool isDash = false;
+    public float dashDistance = 2f;
+    KeyCode lastKeyCode;
+    float doubleTapTime;
+
     void Start()
     {
         anim = GetComponent<Animator>();
@@ -30,7 +35,7 @@ public class Warrior : MonoBehaviour
         CheckMove();
         Walk();
         Jump();
-        Slide();
+        Dash();
     }
     private void CheckGround()
     {
@@ -86,20 +91,33 @@ public class Warrior : MonoBehaviour
             isMove = false;
         }
     }
-    public void Slide()
+    public void Dash()
     {
-        if(isGrounded && Input.GetKeyDown(KeyCode.C))
+        if (Input.GetKeyDown(KeyCode.D))//dddddddddddddddddddddddd
         {
-            if(Input.GetAxis("Horizontal") > 0)
+            if (XSkillCurTime >= XSkillKD)//доделать кд
             {
-                anim.SetInteger("State", 9);
-                
-            }
-            if (Input.GetAxis("Horizontal") < 0)
-            {
-                anim.SetInteger("State", 9);
-
+                if (doubleTapTime > Time.time && lastKeyCode == KeyCode.D)
+                {
+                    XSkillCurTime = 0;
+                    StartCoroutine(DashX(0.5f));
+                    Debug.Log("sad");
+                }
+                else
+                {
+                    doubleTapTime = Time.time + 0.5f;
+                }
+                lastKeyCode = KeyCode.D;
             }
         }
+    }
+    IEnumerator DashX(float direction)
+    {
+        isDash = true;
+        anim.SetInteger("State", 4);
+        rb.velocity = new Vector2(rb.velocity.x, 0f);
+        rb.AddForce(new Vector2(dashDistance * direction, 0f), ForceMode2D.Impulse);
+        yield return new WaitForSeconds(1);
+        isDash = false;
     }
 }
