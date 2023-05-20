@@ -1,9 +1,13 @@
+using Cainos.LucidEditor;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Warrior : MonoBehaviour
 {
+    [SerializeField] private float maxHp = 100;
+    private float curHp;
+
     [SerializeField] private float jumpHeight = 0.2f;
     public Transform groundCheck;
     [SerializeField] private bool isGrounded;
@@ -12,24 +16,30 @@ public class Warrior : MonoBehaviour
     public bool isRight;
     public bool isMove;
     public bool isSlide;
+    public bool isAttack;
 
     Animator anim;
     Rigidbody2D rb;
     private float _walkSpeed = 3;
 
     public bool isDash = false;
-    public float dashDistance = 2f;
+    private float dashDistance = 10f;
     KeyCode lastKeyCode;
     float doubleTapTime;
+
+    private float XSkillKD = 2;
+    private float XSkillCurTime;
 
     void Start()
     {
         anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
+        curHp = maxHp;
     }
 
     void Update()
     {
+        Attack();
         CheckGround();
         Flip();
         CheckMove();
@@ -41,9 +51,9 @@ public class Warrior : MonoBehaviour
     {
         Collider2D[] colliders = Physics2D.OverlapCircleAll(groundCheck.position, 0.2f);
         isGrounded = colliders.Length > 1;
-        if (!isGrounded && !isClimbing)
+        if (!isGrounded && !isClimbing && !isDash && !isAttack)
             anim.SetInteger("State", 3);
-        if (isGrounded && !isClimbing)
+        if (isGrounded && !isClimbing && !isDash && !isAttack)
             anim.SetInteger("State", 0);
     }
     private void Jump()
@@ -56,12 +66,12 @@ public class Warrior : MonoBehaviour
     }
     void Flip()
     {
-        if (Input.GetAxis("Horizontal") > 0)
+        if (Input.GetAxis("Horizontal") > 0 && !isAttack)
         {
             transform.localRotation = Quaternion.Euler(0, 0, 0);
             isRight = true;
         }
-        if (Input.GetAxis("Horizontal") < 0)
+        if (Input.GetAxis("Horizontal") < 0 && !isAttack)
         {
             isRight = false;
             transform.localRotation = Quaternion.Euler(0, 180, 0);
@@ -72,10 +82,10 @@ public class Warrior : MonoBehaviour
         float translationX = Input.GetAxis("Horizontal") * _walkSpeed;
 
         translationX *= Time.deltaTime;
+        if (isMove && !isDash && !isAttack)
+            transform.localPosition += new Vector3(translationX, 0, 0);
 
-        transform.localPosition += new Vector3(translationX, 0, 0);
-
-        if (isMove && isGrounded)
+        if (isMove && isGrounded && !isDash && !isAttack)
         {
             anim.SetInteger("State", 1);
         }
@@ -93,24 +103,30 @@ public class Warrior : MonoBehaviour
     }
     public void Dash()
     {
-        if (Input.GetKeyDown(KeyCode.D))//dddddddddddddddddddddddd
+        XSkillCurTime += Time.deltaTime + 0.0001f;
+        m_Dash(KeyCode.D,0.7f);
+        m_Dash(KeyCode.A,-0.7f);
+    }
+    private void m_Dash(KeyCode keyCode,float direct)
+    {
+        if (Input.GetKeyDown(keyCode))
         {
             if (XSkillCurTime >= XSkillKD)//доделать кд
             {
-                if (doubleTapTime > Time.time && lastKeyCode == KeyCode.D)
+                if (doubleTapTime > Time.time && lastKeyCode == keyCode)
                 {
                     XSkillCurTime = 0;
-                    StartCoroutine(DashX(0.5f));
-                    Debug.Log("sad");
+                    StartCoroutine(DashX(direct));
                 }
                 else
                 {
                     doubleTapTime = Time.time + 0.5f;
                 }
-                lastKeyCode = KeyCode.D;
+                lastKeyCode = keyCode;
             }
         }
     }
+    
     IEnumerator DashX(float direction)
     {
         isDash = true;
@@ -119,5 +135,40 @@ public class Warrior : MonoBehaviour
         rb.AddForce(new Vector2(dashDistance * direction, 0f), ForceMode2D.Impulse);
         yield return new WaitForSeconds(1);
         isDash = false;
+    }
+    public void Attack()
+    {
+        if(!isAttack)
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                StartCoroutine(Attack_anim(10, 0.93f));
+            }
+            if (Input.GetMouseButtonDown(1))
+            {
+                StartCoroutine(Attack_anim(6, 0.74f));
+            }
+        }
+    }
+    IEnumerator Attack_anim(int AnimState,float AnimTime)
+    {
+        isMove = false;
+        isAttack = true;
+        anim.SetInteger("State", AnimState);
+        yield return new WaitForSeconds(AnimTime);
+        isAttack = false;
+        isMove = true;
+    }
+    public void RecountHp(float deltaHp)
+    {
+        if (deltaHp < 0)
+        {
+            curHp = curHp + deltaHp;
+        }
+        else if (curHp > maxHp)
+        {
+            curHp = curHp + deltaHp;
+            curHp = maxHp;//если игрок подберет +1жизнь, а у него их уже 3, то хп останется на том же уровне
+        }
     }
 }
