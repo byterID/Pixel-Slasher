@@ -6,7 +6,7 @@ using UnityEngine;
 public class Warrior : MonoBehaviour
 {
     [SerializeField] private float maxHp = 100;
-    private float curHp;
+    [SerializeField] private float curHp;
 
     [SerializeField] private float jumpHeight = 0.2f;
     public Transform groundCheck;
