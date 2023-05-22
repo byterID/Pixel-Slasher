@@ -2,6 +2,7 @@ using Cainos.LucidEditor;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Warrior : MonoBehaviour
 {
@@ -30,8 +31,11 @@ public class Warrior : MonoBehaviour
     private float XSkillKD = 2;
     private float XSkillCurTime;
 
+    public Image healthBar;
+
     void Start()
     {
+        
         anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
         curHp = maxHp;
@@ -39,6 +43,7 @@ public class Warrior : MonoBehaviour
 
     void Update()
     {
+        healthBar.fillAmount = curHp / 100;
         Attack();
         CheckGround();
         Flip();
@@ -161,6 +166,8 @@ public class Warrior : MonoBehaviour
     }
     public void RecountHp(float deltaHp)
     {
+        healthBar.fillAmount = curHp / 100;
+
         if (deltaHp < 0)
         {
             curHp = curHp + deltaHp;
@@ -170,5 +177,11 @@ public class Warrior : MonoBehaviour
             curHp = curHp + deltaHp;
             curHp = maxHp;//если игрок подберет +1жизнь, а у него их уже 3, то хп останется на том же уровне
         }
+        if(curHp <= 0)
+        {
+            curHp = 0;
+        }
     }
+
+    
 }

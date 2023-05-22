@@ -24,6 +24,7 @@ public class Enemy : MonoBehaviour
         if(collision.collider.tag == "Player")
         {
             war.RecountHp(-10);
+            collision.gameObject.GetComponent<Rigidbody2D>().AddForce(transform.right * 8f, ForceMode2D.Impulse);
         }
     }
 }

@@ -123,6 +123,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHp: 100
+  curHp: 0
   jumpHeight: 4
   groundCheck: {fileID: 3232020744087459445}
   isGrounded: 0
@@ -132,6 +133,7 @@ MonoBehaviour:
   isSlide: 0
   isAttack: 0
   isDash: 0
+  healthBar: {fileID: 0}
 --- !u!50 &3232020743834035623
 Rigidbody2D:
   serializedVersion: 4
